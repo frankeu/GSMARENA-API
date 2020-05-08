@@ -1,2 +1,5 @@
 # GSMARENA-API
-Just upload and run
+Just upload, modify index.php, and run it
+
+#Demo
+http://frank.heliohost.org/gsmarena/
