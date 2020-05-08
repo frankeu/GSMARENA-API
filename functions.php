@@ -1,5 +1,5 @@
 <?php
-//************* GSMARENA API CORE END **************
+//************ GSMARENA API CORE START *************
 //************* CODED BY IZUL WAHIDIN *************
 
 //Fungsi curl/Grab [Start]
@@ -10,15 +10,15 @@ function grab($url){
 
 //Fungsi Multi Preg Match [Start]
 function pregAll($regex,$data){
-    preg_match_all($regex,$data,$result);
-    return $result;
+    preg_match_all($regex,$data,$table);
+    return $table;
 }
 //Fungsi Multi Preg Match [End]
 
 //Fungsi Single Preg Match [Start]
 function pregOne($regex,$data){
-    preg_match($regex,$data,$result);
-    return $result;
+    preg_match($regex,$data,$table);
+    return $table;
 }
 //Fungsi Single Preg Match [End]
 
@@ -27,6 +27,14 @@ function stripGan($data){
 	return strip_tags($data,'<sup>');
 }
 //Fungsi Strip HTML [End]
+
+//Fungsi Explode HTML [Start]
+function explodeGrab($one,$two,$data){
+    $pecah = explode($one,$data);
+    $pecah = explode($two,$pecah[1]);
+    return $pecah[0];
+}
+//Fungsi Explode HTML [End]
 
 //Fungsi Recursive Convert ke utf8 [Start]
 function utf8ize($d) {
@@ -44,6 +52,8 @@ function utf8ize($d) {
 //Fungsi GSMARENA [Start]
 function gsmarena($gsm){
 	$data = grab($gsm);
+	$imgdata = pregOne('/<li class="article-info-meta-link light"><a href=(.*?)><i class="head-icon icon-pictures"><\/i>Pictures<\/a><\/li/',$data);
+	$imgGet = pregAll('/src="(.*?)"/',explodeGrab('<div id="pictures-list">','<br class="clear" />',grab('https://www.gsmarena.com/'.$imgdata[1])));
 	$data_explode_table = explode('<table cellspacing="0">',$data);
 	unset($data_explode_table[0]);
 	foreach($data_explode_table as $key => $value){
@@ -54,10 +64,10 @@ function gsmarena($gsm){
 		$subAs[] = array_map('stripGan',$subA[1]);
 		$subBs[] = array_map('stripGan',$subB[2]);
 	}
-	$result = array();
+	$table = array();
 	foreach($mains as $key => $value){
-		$result = array_merge(
-			$result,
+		$table = array_merge(
+			$table,
 			array(
 				$value => array(
 					$subAs[$key],
@@ -66,6 +76,14 @@ function gsmarena($gsm){
 			)
 		);
 	}
+	$result = array_merge(
+		array(
+			'images' => $imgGet[1]
+		),
+		array(
+			'table' => $table
+		),
+	);
 	return json_encode(utf8ize($result),JSON_PRETTY_PRINT);
 }
 //Fungsi GSMARENA [END]
