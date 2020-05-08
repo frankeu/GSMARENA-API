@@ -82,7 +82,7 @@ function gsmarena($gsm){
 		),
 		array(
 			'table' => $table
-		),
+		)
 	);
 	return json_encode(utf8ize($result),JSON_PRETTY_PRINT);
 }
